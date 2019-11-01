@@ -56,7 +56,7 @@ int main() {
  Contact addContact(){
 
      Contact contact;
-     int i, correctName = 0, correctSurname = 0, correctNum = 0;
+     int i, flagCorrectName = 0, flagCorrectSurname = 0, flagCorrectNum = 0;
 
     //routine do get and check the name
     do{
@@ -66,13 +66,13 @@ int main() {
 
         for(i = 0 ; i <= strlen(contact.name), contact.name[i] != '\0'; ++i){
             if(!(isdigit(contact.name[i])) && (contact.name[0] != ' ')){
-                correctName = 1;}
+                flagCorrectName = 1;}
             else{
-                correctName = 0;
+                flagCorrectName = 0;
                 printf("\nThe name has a number in it or it's empty. FIX IT.");
                 break;}
         }
-    }while(correctName == 0);
+    }while(flagCorrectName == 0);
 
     //routine do get and check the surname
     do{
@@ -82,13 +82,13 @@ int main() {
 
         for(i = 0 ; i <= strlen(contact.surname), contact.surname[i] != '\0'; ++i){
             if(!(isdigit(contact.surname[i])) && (contact.name[0] != ' ')){
-                correctSurname = 1;}
+                flagCorrectSurname = 1;}
             else{
-                correctSurname = 0;
+                flagCorrectSurname = 0;
                 printf("\nThe surname has a number in it or it's empty. FIX IT.");
                 break;}
         }
-    }while(correctSurname == 0);
+    }while(flagCorrectSurname == 0);
 
     //routine do get and check the telephone number
     do{
@@ -99,37 +99,41 @@ int main() {
         for(i = 0 ; i <= strlen(contact.telephoneNumber), contact.telephoneNumber[i] != '\0'; ++i){
             if (contact.telephoneNumber[i] < '0' || contact.telephoneNumber[i] > '9' || (contact.telephoneNumber[0] == ' ')){
                 printf("\nThe number has a char in it or it's empty. FIX IT.");
-                correctNum = 1;
+                flagCorrectNum = 1;
                 break;}
             else
-                correctNum = 0;
+                flagCorrectNum = 0;
         }
-    }while(correctNum == 1);
+    }while(flagCorrectNum == 1);
 
     //routine to add email address
-    char *last3 = NULL, *last4 = NULL, *result = NULL;
-    int sizeEmail = 0, pos = 0, correctEmail = 0;
+    char *last3 = NULL, *last4 = NULL, *afterAt = NULL;
+    int sizeEmail = 0, atPos = 0, flagCorrectEmail = 0;
 
     do {
         printf("\nAdd email in the format example@example.com or .it:");
-
         scanf("%[^\n]s", &contact.emailAddress);
         getchar();
-        result = strstr(contact.emailAddress, "@");
-        sizeEmail = strlen(contact.emailAddress);
-        pos = result - contact.emailAddress + 1;
-        last3 = &contact.emailAddress[sizeEmail - 3];
-        last4 = &contact.emailAddress[sizeEmail - 4];
 
-        if(contact.emailAddress[0] != '@' && contact.emailAddress[0] != ' ' && isalnum(contact.emailAddress[pos + 1])
+        afterAt = strstr(contact.emailAddress, "@");      //extract the part of the email from @ on (es @gmail.com)
+        sizeEmail = strlen(contact.emailAddress);         //gives the lenght of the email
+        atPos = afterAt - contact.emailAddress + 1;       //gives the position of the index associated to the @
+        last3 = &contact.emailAddress[sizeEmail - 3];     //store the last 3 char (es .it)
+        last4 = &contact.emailAddress[sizeEmail - 4];     //store the last 4 char (es .com)
+
+        /* Controls: 1) email can't start with @ or a space; 2) after the @ there will be a alphanumeric char;
+         * 3) email must end with .it or .com
+         * If controls are passed the variable flagCorrectEmail becomes 1 and che cycle ends. Otherwise we have a
+         * warning message and the user has to reinsert the email. */
+        if(contact.emailAddress[0] != '@' && contact.emailAddress[0] != ' ' && isalnum(contact.emailAddress[atPos + 1])
            && ((strcmp(last3, ".it") == 0) || (strcmp(last4, ".com")== 0))){
-            correctEmail=1;}
+            flagCorrectEmail=1;}
         else{
             printf("\nWarning! The email is not valid. Please, insert again.");
-            correctEmail = 0;
+            flagCorrectEmail = 0;
         }
 
-    }while(correctEmail == 0);
+    }while(flagCorrectEmail == 0);
 
     //routine to add the type of contact
     do{
@@ -142,7 +146,6 @@ int main() {
         }
 
     }while(contact.typeOfContact >= 4);
-
 
      return contact;
  }
