@@ -25,18 +25,20 @@ typedef struct {
     TypeOfContact typeOfContact;                //type of the contact
     } Contact;
 
+/* Fuctions */
 Contact getContact();
 void printContact(Contact contact);
 void editContact(Contact contact);
-Contact initializeDinamicVector();
+Contact initializeDynamicVector();
 
 int main() {
 
-    //Contact contact1;
-    Contact pointerAddress;
-    //contact1 = getContact();
+    Contact contact1;
+    //Contact pointerAddress;
+    contact1 = getContact();
+    printContact(contact1);
     //editContact(contact1);
-    pointerAddress = initializeDinamicVector();
+    //pointerAddress = initializeDynamicVector();
 
 
 
@@ -70,9 +72,7 @@ int main() {
                 printf("\nThe name has a number in it or it's empty. FIX IT.");
                 break;}
         }
-
     }while(correctName == 0);
-
 
     //routine do get and check the surname
     do{
@@ -88,7 +88,6 @@ int main() {
                 printf("\nThe surname has a number in it or it's empty. FIX IT.");
                 break;}
         }
-
     }while(correctSurname == 0);
 
     //routine do get and check the telephone number
@@ -105,20 +104,53 @@ int main() {
             else
                 correctNum = 0;
         }
-
     }while(correctNum == 1);
 
+    //routine to add email address
+    char *last3 = NULL, *last4 = NULL, *result = NULL;
+    int sizeEmail = 0, pos = 0, correctEmail = 0;
 
-    printf("\nInsert your email address in this similar format 'example@example.com':");
-    scanf("%s", &contact.emailAddress);
-    printf("\nInsert what type of contacts is:\ntype 0 for WORK,\ntype 1 for FAMILY,\ntype 2 for FRIENDS,"
+    do {
+        printf("\nAdd email in the format example@example.com or .it:");
+
+        scanf("%[^\n]s", &contact.emailAddress);
+        getchar();
+        result = strstr(contact.emailAddress, "@");
+        sizeEmail = strlen(contact.emailAddress);
+        pos = result - contact.emailAddress + 1;
+        last3 = &contact.emailAddress[sizeEmail - 3];
+        last4 = &contact.emailAddress[sizeEmail - 4];
+
+        if(contact.emailAddress[0] != '@' && contact.emailAddress[0] != ' ' && isalnum(contact.emailAddress[pos + 1])
+           && ((strcmp(last3, ".it") == 0) || (strcmp(last4, ".com")== 0))){
+            correctEmail=1;}
+        else{
+            printf("\nWarning! The email is not valid. Please, insert again.");
+            correctEmail = 0;
+        }
+
+    }while(correctEmail == 0);
+
+    //routine to add the type of contact
+    do{
+        printf("\nInsert what type of contacts is:\ntype 0 for WORK,\ntype 1 for FAMILY,\ntype 2 for FRIENDS,"
                "\ntype 3 for OTHERS");
-    scanf("%d", &contact.typeOfContact);
+        scanf("%d", &contact.typeOfContact);
+
+        if(contact.typeOfContact >= 4){
+            printf("\nInvalid choice. Please insert again.");
+        }
+
+    }while(contact.typeOfContact >= 4);
+
 
      return contact;
  }
 
-// 3) Implementare una procedura che stampi in modo chiaro e ordinato tutti i dati del contatto
+/** PRINT CONTACT
+ *  This procedure allows to print clearly contact details
+ * @param contact passes the structure where the data is saved
+ */
 void printContact(Contact contact){
     printf("\nThe name of the contact is %s.", contact.name);
     printf("\nThe surname of the contact is %s.", contact.surname);
@@ -127,10 +159,12 @@ void printContact(Contact contact){
     printf("\nThe type of the contact is %d (0=WORK, 1=FAMILY, 2=FRIENDS, 3=OTHERS).", contact.typeOfContact);
  }
 
-/* 4) Implementare una funzione o procedura che permetta la modifica di un contatto.
-*  Riceverà come parametro un contatto, lo stamperà e chiederà quale campo deve essere modificato.
-*  Una volta inserito il nuovo valore, a seconda dei casi il contatto dovrà essere restituito al chiamante o meno
-*  (dipende se si utilizza una procedura o una funzione). */
+/** EDIT CONTACT
+ *  This procedure print the information about a contact and ask to the user which field he/she wants to edit
+ *  I use a switch case to set the choices the user has. Depending on the user's choice,
+ *  a specific subroutine will be started to modify the required field.
+ * @param contact passes the structure where the data is saved
+ */
 void editContact(Contact contact){
 
     printContact(contact);
@@ -174,10 +208,13 @@ void editContact(Contact contact){
     printContact(contact);
   }
 
-/* 5) Implementare una funzione che inizializzi un vettore dinamico. Essa dovrà allocare lo spazio per un contatto
-*  e restituire l'indirizzo di memoria relativo se l'allocazione è andata a buon fine.
-*  Altrimenti il programma terminerà comunicando all'utente tale malfunzionamento. */
-Contact initializeDinamicVector(){
+/** DINAMIC  VECTOR
+ * This function allocates the space for a given type of structure. Ask the user how many contacts
+ * wants and generates a dynamic vector. It checks if the memory is well allocated and prints the memory address,
+ * otherwise it gives an error message and the function is terminated.
+ * @return a pointer with the generated memory address
+ */
+Contact initializeDynamicVector(){
 
     Contact *pointer = NULL;
     int n;
