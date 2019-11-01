@@ -26,7 +26,7 @@ typedef struct {
     } Contact;
 
 /* Fuctions */
-Contact getContact();
+Contact addContact();
 void printContact(Contact contact);
 void editContact(Contact contact);
 Contact initializeDynamicVector();
@@ -35,7 +35,7 @@ int main() {
 
     Contact contact1;
     //Contact pointerAddress;
-    contact1 = getContact();
+    contact1 = addContact();
     printContact(contact1);
     //editContact(contact1);
     //pointerAddress = initializeDynamicVector();
@@ -53,7 +53,7 @@ int main() {
  * - indirizzo email (deve contenere almeno un carattere prima della chiocciola, almeno un carattere chiocciola,
  *  almeno un carattere dopo la chiocchiola, un punto e un dominio come com o it)
  *  - tipologia (deve essere richiesto in modo semplice per l'utente, ad esempio usando un menu)*/
- Contact getContact(){
+ Contact addContact(){
 
      Contact contact;
      int i, correctName = 0, correctSurname = 0, correctNum = 0;
@@ -64,7 +64,7 @@ int main() {
         scanf("%[^\n]s", &contact.name);
         getchar();
 
-        for(i = 0 ; i <= *contact.name, contact.name[i] != '\0'; ++i){
+        for(i = 0 ; i <= strlen(contact.name), contact.name[i] != '\0'; ++i){
             if(!(isdigit(contact.name[i])) && (contact.name[0] != ' ')){
                 correctName = 1;}
             else{
@@ -80,7 +80,7 @@ int main() {
         scanf("%[^\n]s", &contact.surname);
         getchar();
 
-        for(i = 0 ; i <= *contact.surname, contact.surname[i] != '\0'; ++i){
+        for(i = 0 ; i <= strlen(contact.surname), contact.surname[i] != '\0'; ++i){
             if(!(isdigit(contact.surname[i])) && (contact.name[0] != ' ')){
                 correctSurname = 1;}
             else{
@@ -96,7 +96,7 @@ int main() {
         scanf("%[^\n]s", &contact.telephoneNumber);
         getchar();
 
-        for(i = 0 ; i <= *contact.telephoneNumber, contact.telephoneNumber[i] != '\0'; ++i){
+        for(i = 0 ; i <= strlen(contact.telephoneNumber), contact.telephoneNumber[i] != '\0'; ++i){
             if (contact.telephoneNumber[i] < '0' || contact.telephoneNumber[i] > '9' || (contact.telephoneNumber[0] == ' ')){
                 printf("\nThe number has a char in it or it's empty. FIX IT.");
                 correctNum = 1;
