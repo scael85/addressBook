@@ -29,26 +29,33 @@ typedef struct {
     } Contact;
 
 /* Functions */
-void addContact(Contact *contact);
-void addName(Contact *contact);
-void addSurname(Contact *contact);
-void addTelephoneNum(Contact *contact);
-void addEmail(Contact *contact);
-void addType(Contact *contact);
-//void removeContact(Contact *contact);
-//void searchContact(Contact *contact);
-//void DisplayContact(PHONEBOOK *);
-void printContact(Contact *contact);
-void editContact(Contact *contact);
-Contact initializeDynamicVector();
+void addContact(Contact *);
+void addName(Contact *);
+void addSurname(Contact *);
+void addTelephoneNum(Contact *);
+void addEmail(Contact *);
+void addType(Contact *);
+//void removeContact(Contact *);
+//void searchContact(Contact *);
+Contact * initializeDynamicVector(int);
+void printContact(Contact *);
+void editContact(Contact *);
 
 int main() {
 
-    Contact contact;
+    int size;
 
-    int option = 0, size = 0;
+    printf("\nHello! Welcome to your Phone Book!");
+    printf("\nHow many contacts do you want to create?");
+    scanf("%d", &size);
 
-    for( ; ; )
+    Contact *contact = initializeDynamicVector(size);
+
+    int option = 0, i;
+
+    printf("What do you want to do?\nPlease select an option from the menu: ");
+
+    for(i = 0; i < size ; ++i )
     {
         printf("\n1 - Add contact"
                "\n2 - Edit contact"
@@ -57,19 +64,20 @@ int main() {
                "\n0 - Exit\n\n"
                "Select an option: ");
         scanf("%d", &option);
+        getchar();
 
         switch(option)
         {
             case 1:
-                addContact(&contact);
+                addContact(contact);
                 break;
             case 2:
-                editContact(&contact);
+                editContact(contact);
             case 3:
                 //removeContact(&contact);
                 break;
             case 4:
-                //a,searchContact(&contact);
+                //searchContact(&contact);
                 break;
             case 0:
                 printf("\nThanks for using this phonebook! Bye!");
@@ -82,8 +90,11 @@ int main() {
     }
 }
 
-/*2) Implementare una funzione o procedura che acquisisca i campi di un Contatto e restituisca tale contatto.
- *  - tipologia (deve essere richiesto in modo semplice per l'utente, ad esempio usando un menu)*/
+/** ADD NEW CONTACT
+ * This procedure stores in a structure all the acquisitions of the fields of a contact (using individual
+ * and dedicated procedures) and returns the contact by printing it.
+ * @param contact is a pointer to a structure
+ */
 void addContact(Contact *contact){
 
      int i, flagCorrectName = 0, flagCorrectSurname = 0, flagCorrectNum = 0;
@@ -192,11 +203,11 @@ void addName(Contact *contact){
 
     do{
         printf("\nInsert the name (no numbers allow):");
-        scanf("%[^\n]s", contact->name);
+        scanf("%[^\n]s", contact[i].name);
         getchar();
 
-        for(i = 0 ; i <= strlen(contact->name), contact->name[i] != '\0'; ++i){
-            if(!(isdigit(contact->name[i])) && (contact->name[0] != ' ')){
+        for(i = 0 ; i <= strlen(contact[i].name), contact[i].name[i] != '\0'; ++i){
+            if(!(isdigit(contact[i].name[i])) && (contact[i].name[0] != ' ')){
                 correctName = 1;}
             else{
                 correctName = 0;
@@ -392,22 +403,20 @@ void editContact(Contact *contact){
  * otherwise it gives an error message and the function is terminated.
  * @return a pointer with the generated memory address
  */
-Contact initializeDynamicVector(){
+Contact * initializeDynamicVector(int n){
 
-    Contact *pointer = NULL;
-    int n;
+    Contact *contact = NULL;
 
-    printf("\nHow many contacts n do you want?");
-    scanf("%d", &n);
-    pointer = (Contact *)malloc(n * sizeof(Contact));
-    if ( pointer == NULL ){
+    contact = (Contact *)malloc(n * sizeof(Contact));
+    if ( contact == NULL ){
         printf("\nFailed to allocate memory");
         exit(-1);
     }
     else
-        printf("\nThe memory address of a contact id %p", pointer);
+        printf("\nThe memory address of your phonebook is %p", contact);
+        printf("\n");
 
-    return *pointer;
+    return contact;
 }
 
 /* 6) Implementare la funzione di inserimento seguendo la logica seguente: passo il contatto,
@@ -419,14 +428,17 @@ Contact initializeDynamicVector(){
  *  operazioni ricordarsi di tenere traccia dell'eventuale cambio di valore del puntatore al vettore dinamico.*/
 
 /*  7) Implementare la funzione di eliminazione offrendo le seguenti possibilità:
- *  - eliminare tutta la rubrica
- *  - eliminare un contatto con un certo indice
- *  - eliminare tutti i contatti con un certo nome o cognome
- *  - elininare una categoria di contatti
  *  In tutti i casi dovremo sempre stare attenti a modificare lo spazio occupato dal vettore,
  *  se ad esempio abbiamo un vettore di 3 contatti A, B e C e dobbiamo eliminare B sposteremo C in B e
  *  riallocheremo lo spazio eliminando un elemento (l'ultimo).
  *  Ricordarsi sempre di restituire il puntatore al vettore dinamico.*/
+/** DELETE FUCTION
+ * This function allows to delete several things from the phonebook: all contacts; contact with a certain ID;
+ * all contacts with a certain name or surname; all contacts of certain type.
+ *
+ * @param contact
+ */
+ /*
 void delete(){
 
     printf("\n");
@@ -445,18 +457,24 @@ void delete(){
             break;
         case 2:
 
+            printf("The contact with %dID has been delated.", i+1);
             break;
         case 3:
 
+            printf("All contacts named %s have been delated.", .....);
             break;
         case 4:
 
+            printf("All contacts of type %d have been delated.", ....);
             break;
-        default:
+        case 0:
             printf("\nBack to the menu");
-
+            return;
+        default:
+            printf("\nInvalid option selected...");
+            break;
     }
 
-}
+}*/
 
 
