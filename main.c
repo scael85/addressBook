@@ -10,8 +10,12 @@
 #include <string.h>
 
 // MACROs
-#define STRING_DIM 30       //dimension for nouns and emails
-#define NUM_DIM 15          //dimension for telephone number
+#define STRING_DIM 30           //dimension for nouns and emails
+#define NUM_DIM 15              //dimension for telephone number
+#define UPDATE 1                //add 1 contact
+
+//static type to take into account the increment of contacts when the function is called
+static int currentAlloc = 0;    //Num of record currently allocated. The phonebook is empty
 
 /* Enumeration to define the type of possible contacts */
 typedef enum {WORK, FAMILY, FRIENDS, OTHERS} TypeOfContact;
@@ -34,28 +38,25 @@ void addEmail(Contact *);
 void addType(Contact *);
 //void removeContact(Contact *);
 //void searchContact(Contact *);
-Contact * initializeDynamicVector(int);
-Contact * increaseContactVector(Contact *, int);
+Contact * initializeDynamicVector();
+Contact * increaseContactVector(Contact *);
 void printContact(Contact *);
 void editContact(Contact *);
 
 int main() {
 
-    static int currentAlloc = 0;               //Num of record currently allocated
-    int choice;
+    int option = 0, i = 0;
+    Contact contactArray[currentAlloc];
 
-    // Inizializza l'array dinamico allocando lo spazio per un contatto.
-    Contact * contactVector = initializeDynamicVector(currentAlloc);
+    // Initialization of the dynamic array
+
+    Contact* contactVector = initializeDynamicVector();
 
     printf("\nHello! Welcome to your Phone Book!");
-
-    int option = 0, i;
-
-    printf("What do you want to do?\nPlease select an option from the menu: ");
+    printf("\nWhat do you want to do?\nPlease select an option from the menu: ");
 
     for(; ;)
     {
-
         printf("\n1 - Add contact"
                "\n2 - Edit contact"
                "\n3 - Remove contact"
@@ -68,10 +69,12 @@ int main() {
         switch(option)
         {
             case 1:
-                addContact(&contactVector[i]);
+                contactVector = increaseContactVector(contactVector);
+                    addContact(&contactVector[currentAlloc-1]);
+                    printContact(&contactVector[currentAlloc-1]);
                 break;
             case 2:
-                editContact(&contactVector[i]);
+                //editContact(&contactVector[currentAlloc - 1]);
             case 3:
                 //removeContact(&contact);
                 break;
@@ -87,6 +90,8 @@ int main() {
         }
         printf("\n");
     }
+
+    return 0;
 }
 
 /** ADD NEW CONTACT
@@ -94,119 +99,23 @@ int main() {
  * and dedicated procedures) and returns the contact by printing it.
  * @param contact is a pointer to a structure
  */
-void addContact(Contact *contactVector){
+void addContact(Contact *contact){
 
-    int update;
-    printf("\nHow many contacts do you want to create?");
-    scanf("%d", &update);
+        //routine do get and check the name
+        addName(contact);
 
-    contactVector = increaseContactVector(contactVector, update);
+        //routine do get and check the surname
+        addSurname(contact);
 
-     int i, flagCorrectName = 0, flagCorrectSurname = 0, flagCorrectNum = 0;
+        //routine do get and check the telephone number
+        addTelephoneNum(contact);
 
-    //routine do get and check the name
-    addName(&contact[i]);
-    /*
-    do{
-        printf("\nInsert your name (no numbers allow):");
-        scanf("%[^\n]s", contact->name);
-        getchar();
+        //routine to add email address
+        addEmail(contact);
 
-        for(i = 0 ; i <= strlen(contact->name), contact->name[i] != '\0'; ++i){
-            if(!(isdigit(contact->name[i])) && (contact->name[0] != ' ')){
-                flagCorrectName = 1;}
-            else{
-                flagCorrectName = 0;
-                printf("\nThe name has a number in it or it's empty. FIX IT.");
-                break;}
-        }
-    }while(flagCorrectName == 0);*/
-
-    //routine do get and check the surname
-    addSurname(&contact[i]);
-
-    /*do{
-        printf("\nInsert your surname (no numbers allow):");
-        scanf("%[^\n]s", contact->surname);
-        getchar();
-
-        for(i = 0 ; i <= strlen(contact->surname),contact->surname[i] != '\0'; ++i){
-            if(!(isdigit(contact->surname[i])) && (contact->name[0] != ' ')){
-                flagCorrectSurname = 1;}
-            else{
-                flagCorrectSurname = 0;
-                printf("\nThe surname has a number in it or it's empty. FIX IT.");
-                break;}
-        }
-    }while(flagCorrectSurname == 0);*/
-
-    //routine do get and check the telephone number
-    addTelephoneNum(&contact[i]);
-
-    /*do{
-        printf("\nInsert your telephone number (no symbols or letters allow):");
-        scanf("%[^\n]s", contact->telephoneNumber);
-        getchar();
-
-        for(i = 0 ; i <= strlen(contact->telephoneNumber), contact->telephoneNumber[i] != '\0'; ++i){
-            if (contact->telephoneNumber[i] < '0' || contact->telephoneNumber[i] > '9' || (contact->telephoneNumber[0] == ' ')){
-                printf("\nThe number has a char in it or it's empty. FIX IT.");
-                flagCorrectNum = 1;
-                break;}
-            else
-                flagCorrectNum = 0;
-        }
-    }while(flagCorrectNum == 1);*/
-
-    //routine to add email address
-    addEmail(&contact[i]);
-
-    /*char *last3 = NULL, *last4 = NULL, *afterAt = NULL;
-    int sizeEmail = 0, atPos = 0, flagCorrectEmail = 0;
-
-    do {
-        printf("\nAdd email in the format example@example.com or .it:");
-        scanf("%[^\n]s", contact->emailAddress);
-        getchar();
-
-        afterAt = strstr(contact->emailAddress, "@");      //extract the part of the email from @ on (es @gmail.com)
-        sizeEmail = strlen(contact->emailAddress);         //gives the length of the email
-        atPos = afterAt - contact->emailAddress + 1;       //gives the position of the index associated to the @
-        last3 = &contact->emailAddress[sizeEmail - 3];     //store the last 3 char (es .it)
-        last4 = &contact->emailAddress[sizeEmail - 4];     //store the last 4 char (es .com)
-
-         Controls: 1) email can't start with @ or a space; 2) after the @ there will be a alphanumeric char;
-         * 3) email must end with .it or .com
-         * If controls are passed the variable flagCorrectEmail becomes 1 and che cycle ends. Otherwise we have a
-         * warning message and the user has to reinsert the email.
-        if(contact->emailAddress[0] != '@' && contact->emailAddress[0] != ' ' && isalnum(contact->emailAddress[atPos + 1])
-           && ((strcmp(last3, ".it") == 0) || (strcmp(last4, ".com")== 0))){
-            flagCorrectEmail=1;}
-        else{
-            printf("\nWarning! The email is not valid. Please, insert again.");
-            flagCorrectEmail = 0;
-        }
-
-    }while(flagCorrectEmail == 0);*/
-
-    //routine to add the type of contact
-    addType(&contact[i]);
-
-    /*do{
-        printf("\nInsert what type of contacts is:\ntype 0 for WORK,\ntype 1 for FAMILY,\ntype 2 for FRIENDS,"
-               "\ntype 3 for OTHERS");
-        printf("\nSelect an option: ");
-        scanf("%d", contact->typeOfContact);
-
-        if(contact->typeOfContact >= 4){
-            printf("\nInvalid choice. Please insert again.");
-        }
-
-    }while(contact->typeOfContact >= 4);*/
-
-    printContact(&contact[i]);
-
- }
+        //routine to add the type of contact
+        addType(contact);
+}
 
  /** ADD A NAME
   * This procedure allows to add a non empty name. It checks there are no numbers in it.
@@ -218,11 +127,11 @@ void addName(Contact *contact){
 
     do{
         printf("\nInsert the name (no numbers allow):");
-        scanf("%[^\n]s", contact[i].name);
+        scanf("%[^\n]s", contact->name);
         getchar();
 
-        for(i = 0 ; i <= strlen(contact[i].name), contact[i].name[i] != '\0'; ++i){
-            if(!(isdigit(contact[i].name[i])) && (contact[i].name[0] != ' ')){
+        for(i = 0 ; i <= strlen(contact->name), contact->name[i] != '\0'; ++i){
+            if(!(isdigit(contact->name[i])) && (contact->name[0] != ' ')){
                 correctName = 1;}
             else{
                 correctName = 0;
@@ -245,11 +154,11 @@ void addSurname(Contact *contact){
 
     do{
         printf("\nInsert the surname (no numbers allow):");
-        scanf("%[^\n]s", contact[i].surname);
+        scanf("%[^\n]s", contact->surname);
         getchar();
 
-        for(i = 0 ; i <= strlen(contact[i].surname), contact[i].surname[i] != '\0'; ++i){
-            if(!(isdigit(contact[i].surname[i])) && (contact[i].surname[0] != ' ')){
+        for(i = 0 ; i <= strlen(contact->surname), contact->surname[i] != '\0'; ++i){
+            if(!(isdigit(contact->surname[i])) && (contact->surname[0] != ' ')){
                 correctSurname = 1;}
             else{
                 correctSurname = 0;
@@ -272,12 +181,12 @@ void addTelephoneNum(Contact *contact){
 
     do{
         printf("\nInsert telephone number (no symbols or letters allow):");
-        scanf("%[^\n]s", contact[i].telephoneNumber);
+        scanf("%[^\n]s", contact->telephoneNumber);
         getchar();
 
-        for(i = 0 ; i <= strlen(contact[i].telephoneNumber), contact[i].telephoneNumber[i] != '\0'; ++i){
-            if (contact[i].telephoneNumber[i] < '0' || contact[i].telephoneNumber[i] > '9' ||
-                (contact[i].telephoneNumber[0] == ' ')){
+        for(i = 0 ; i <= strlen(contact->telephoneNumber), contact->telephoneNumber[i] != '\0'; ++i){
+            if (contact->telephoneNumber[i] < '0' || contact->telephoneNumber[i] > '9' ||
+                (contact->telephoneNumber[0] == ' ')){
                 printf("\nWarning...");
                 printf("\nthe number has a char or it's empty. Please insert again.\n");
                 correctNum = 1;
@@ -303,15 +212,15 @@ void addEmail(Contact *contact){
     do {
         printf("\nInsert the email in the format example@example.com or .it:");
 
-        scanf("%[^\n]s", contact[i].emailAddress);
+        scanf("%[^\n]s", contact->emailAddress);
         getchar();
-        result = strstr(contact[i].emailAddress, "@");
-        sizeEmail = strlen(contact[i].emailAddress);
-        pos = result - contact[i].emailAddress + 1;
-        last3 = &contact[i].emailAddress[sizeEmail - 3];
-        last4 = &contact[i].emailAddress[sizeEmail - 4];
+        result = strstr(contact->emailAddress, "@");
+        sizeEmail = strlen(contact->emailAddress);
+        pos = result - contact->emailAddress + 1;
+        last3 = &contact->emailAddress[sizeEmail - 3];
+        last4 = &contact->emailAddress[sizeEmail - 4];
 
-        if(contact[i].emailAddress[0] != '@' && contact[i].emailAddress[0] != ' ' && isalnum(contact[i].emailAddress[pos + 1])
+        if(contact->emailAddress[0] != '@' && contact->emailAddress[0] != ' ' && isalnum(contact->emailAddress[pos + 1])
            && ((strcmp(last3, ".it") == 0) || (strcmp(last4, ".com")== 0))){
             correctEmail=1;}
         else{
@@ -331,20 +240,11 @@ void addEmail(Contact *contact){
  */
 void addType(Contact *contact){
 
-    int i;
-
-    do{
         printf("\nInsert what type of contact is:\ntype 0 for WORK,\ntype 1 for FAMILY,\ntype 2 for FRIENDS,"
                "\ntype 3 for OTHERS");
         printf("\nSelect an option: ");
-        scanf("%d", contact[i].typeOfContact);
-
-        if(contact[i].typeOfContact >= 4){
-            printf("\nInvalid choice. Please insert again.");
-        }
-
-    }while(contact[i].typeOfContact >= 4);
-
+        scanf("%d", &contact->typeOfContact);
+        getchar();
 }
 
 /** VISUALIZED A CONTACT
@@ -353,18 +253,12 @@ void addType(Contact *contact){
  */
 void printContact(Contact *contact){
 
-    int i, size;
-
-    for(i = 0 ; i < size ; i++)
-    {
-        printf("\nID       : %d", i+1);
-        printf("\nName     : %s", contact[i].name);
-        printf("\nSurname  : %s", contact[i].name);
-        printf("\nMobile   : %s", contact[i].telephoneNumber);
-        printf("\nEmail    : %s", contact[i].emailAddress);
-        printf("\nType     : %d (0=WORK, 1=FAMILY, 2=FRIENDS, 3=OTHERS).", contact[i].typeOfContact);
+        printf("\nName     : %s", contact->name);
+        printf("\nSurname  : %s", contact->surname);
+        printf("\nMobile   : %s", contact->telephoneNumber);
+        printf("\nEmail    : %s", contact->emailAddress);
+        printf("\nType     : %d (0=WORK, 1=FAMILY, 2=FRIENDS, 3=OTHERS).", contact->typeOfContact);
         printf("\n");
-    }
 }
 
 /** EDIT CONTACT
@@ -375,7 +269,7 @@ void printContact(Contact *contact){
  */
 void editContact(Contact *contact){
 
-    printContact(contact);
+    //printContact(contact);
     printf("\n");
 
     int choice;
@@ -416,7 +310,7 @@ void editContact(Contact *contact){
             break;
     }
 
-    printContact(contact);
+    //printContact(contact);
   }
 
 /** DINAMIC  VECTOR
@@ -425,28 +319,31 @@ void editContact(Contact *contact){
  * otherwise it gives an error message and the function is terminated.
  * @return a pointer with the generated memory address
  */
-Contact * initializeDynamicVector(int n){
+Contact * initializeDynamicVector(){
 
-    Contact *contact = NULL;
+    Contact *contactVector = NULL;
 
-    contact = (Contact *)malloc(n * sizeof(Contact));
-    if ( contact == NULL ){
+    contactVector = (Contact *) calloc(currentAlloc, sizeof(Contact));
+    if (contactVector == NULL) {
         printf("\nFailed to allocate memory");
         exit(-1);
-    }
-    else
-        printf("\nThe memory address of your phonebook is %p", contact);
-        printf("\n");
+    } else
+        printf("\nThe memory address of your phonebook is %p", contactVector);
+    printf("\n");
 
-    return contact;
+    return contactVector;
 }
 
-Contact * increaseContactVector(Contact* contactVector, update){
+/** INCREASE THE SPACE IN THE ARRAY OF CONTACTS
+ * @param contactVector is the starting dynamic vector
+ * @param update is the number of new contacts that the user wants to add to the phonebook
+ * @return the starting dynamic vector increased by the choice of the user
+ */
+Contact * increaseContactVector(Contact* contactVector){
 
-    static int currentAlloc = 0;
+    currentAlloc = currentAlloc + UPDATE;                 //update the num of available allocations
 
-    currentAlloc =+ update;
-    contactVector = (Contact *) realloc (contactVector, currentAlloc* sizeof(Contact));
+    contactVector = (Contact *) realloc(contactVector, currentAlloc* sizeof(Contact));
     if ( contactVector == NULL ){
         printf("\nFailed to allocate memory");
         exit(-1);
