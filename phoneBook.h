@@ -19,11 +19,11 @@ typedef enum {WORK, FAMILY, FRIENDS, OTHERS} TypeOfContact;
 
 /* Structure of the contacts */
 typedef struct {
-    char name[STRING_DIM];                      //name
-    char surname[STRING_DIM];                   //surname
-    char telephoneNumber[NUM_DIM];              //telephone number
-    char emailAddress[STRING_DIM];              //email address
-    TypeOfContact typeOfContact;                //type of the contact
+    char name[STRING_DIM + 1];                      //name
+    char surname[STRING_DIM + 1];                   //surname
+    char telephoneNumber[NUM_DIM + 1];              //telephone number
+    char emailAddress[STRING_DIM + 1];              //email address
+    TypeOfContact typeOfContact;                    //type of the contact
 } Contact;
 
 /* Functions */
