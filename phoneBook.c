@@ -4,6 +4,7 @@
 
 /** START THE PROGRAM **/
 int start(){
+
     int option = 0, contactID;
 
     // Initialization of the dynamic vector
@@ -28,7 +29,7 @@ int start(){
             case 1:
                 contactVector = increaseContactVector(contactVector);   //function to add 1 space to the dynamic vector
                 addContact(&contactVector[currentSize-1]);              //procedure to add a contact
-                printContact(&contactVector[currentSize-1]);            //print of the new contact
+                printContact(&contactVector[currentSize-1]);            //procedure to print the new contact
                 break;
             case 2:
                 printf("\nWhich contact do you want to modify?");       //ask to the user which contact modify
@@ -38,14 +39,16 @@ int start(){
                 printContact(&contactVector[contactID]);                //print of the modified contact
                 break;
             case 3:
-                //deleteContact(&contact);
+                deleteContact(contactVector);                           //procedure to delete contacts
                 break;
             case 4:
-                //searchContact(&contact);
+                searchContact(contactVector);                           //procedure to search contacts
                 break;
             case 0:
                 printf("\nThanks for using this phonebook! Bye!");
-                return 0;
+                if(contactVector != NULL)
+                    free(contactVector);                                //free the allocated memory
+                return 0;                                               //end of the program
             default:
                 printf("\nInvalid option selected...");
                 break;
@@ -55,17 +58,20 @@ int start(){
 }
 
 /** DINAMIC  VECTOR
- * This function allocates the space for a given type of structure. Ask the user how many contacts
- * wants and generates a dynamic vector. It checks if the memory is well allocated and prints the memory address,
- * otherwise it gives an error message and the function is terminated.
+ * This function allocates in memory a number of bytes equal to a defined size and returns a pointer
+ * of the type declared (in this case struct type) that points to a generic memory address.
+ * It checks if the memory is well allocated and prints the memory address, otherwise it gives
+ * an error message and the function is terminated.
  * @return a pointer with the generated memory address
  */
 Contact * initializeDynamicVector(){
 
+    // Initialization of the dynamic vector
     Contact *contactVector = NULL;
 
-    contactVector = (Contact *) calloc(currentSize, sizeof(Contact));
-    if (contactVector == NULL) {
+    // malloc function: the memory is created but not initialized
+    contactVector = (Contact *) malloc(currentSize* sizeof(Contact));
+    if (contactVector == NULL) {                                                 //check that memory is well allocated
         printf("\nFailed to allocate memory");
         exit(-1);
     } else
@@ -94,17 +100,12 @@ Contact * increaseContactVector(Contact* contactVector){
     return contactVector;
 }
 
-/* 6) Implementare la funzione di inserimento seguendo la logica seguente: passo il contatto,
- *  aumento lo spazio del vettore dinamico per contenere un nuovo elemento e a questo punto inserisco
- *  il nuovo contatto seguendo l'ordine alfabetico. Si possono presentare due casi: inserimento in coda,
- *  inserimento non in coda. Se in coda non dovremo far altro che inserire il contatto nell'ultima (e nuova)
- *  posizione, altrimenti una volta trovato il contatto successivo in ordine alfabetico dovremo far scorrere
- *  tutti i contatti di una posizione e inserire il nuovo contatto nella corretta posizione. Al termine delle
- *  operazioni ricordarsi di tenere traccia dell'eventuale cambio di valore del puntatore al vettore dinamico.*/
 /** ADD NEW CONTACT
  * This procedure stores in a structure all the acquisitions of the fields of a contact (using individual
- * and dedicated procedures) and returns the contact by printing it.
+ * and dedicated procedures).
  * @param contact is a pointer to a structure
+ *
+ * PROBLEM: all new contacts are stored at the end of the dynamic vector and not in alphabetic order
  */
 void addContact(Contact *contact){
 
@@ -130,24 +131,26 @@ void addContact(Contact *contact){
  */
 void addName(Contact *contact){
 
-    int i, correctName = 0;
+    int i, flagCorrectName = 0;
 
     do{
+        // first ask to the user the name
         printf("\nInsert the name (no numbers allow):");
         scanf("%[^\n]s", contact->name);
         getchar();
 
+        // then check if it respect the condition to not be empty and to not have numbers
         for(i = 0 ; i <= strlen(contact->name), contact->name[i] != '\0'; ++i){
             if(!(isdigit(contact->name[i])) && (contact->name[0] != ' ')){
-                correctName = 1;}
+                flagCorrectName = 1;}
             else{
-                correctName = 0;
+                flagCorrectName = 0;
                 printf("\nWarning...");
                 printf("\nthe name has number or it's empty. Please insert again.\n");
                 break;}
         }
 
-    }while(correctName == 0);
+    }while(flagCorrectName == 0);
 
 }
 
@@ -157,24 +160,26 @@ void addName(Contact *contact){
  */
 void addSurname(Contact *contact){
 
-    int i, correctSurname = 0;
+    int i, flagCorrectSurname = 0;
 
     do{
+        // first ask to the user the surname
         printf("\nInsert the surname (no numbers allow):");
         scanf("%[^\n]s", contact->surname);
         getchar();
 
+        // then check if it respect the condition to not be empty and to not have numbers
         for(i = 0 ; i <= strlen(contact->surname), contact->surname[i] != '\0'; ++i){
             if(!(isdigit(contact->surname[i])) && (contact->surname[0] != ' ')){
-                correctSurname = 1;}
+                flagCorrectSurname = 1;}
             else{
-                correctSurname = 0;
+                flagCorrectSurname = 0;
                 printf("\nWarning...");
                 printf("\nthe surname has number or it's empty. Please insert again.\n");
                 break;}
         }
 
-    }while(correctSurname == 0);
+    }while(flagCorrectSurname == 0);
 
 }
 
@@ -184,25 +189,27 @@ void addSurname(Contact *contact){
  */
 void addTelephoneNum(Contact *contact){
 
-    int i, correctNum = 0;
+    int i, flagCorrectNum = 0;
 
     do{
+        // first ask to the user the mobile
         printf("\nInsert telephone number (no symbols or letters allow):");
         scanf("%[^\n]s", contact->telephoneNumber);
         getchar();
 
+        // then check if it respect the condition to not be empty and to not have letters or symbols
         for(i = 0 ; i <= strlen(contact->telephoneNumber), contact->telephoneNumber[i] != '\0'; ++i){
             if (contact->telephoneNumber[i] < '0' || contact->telephoneNumber[i] > '9' ||
                 (contact->telephoneNumber[0] == ' ')){
                 printf("\nWarning...");
                 printf("\nthe number has a char or it's empty. Please insert again.\n");
-                correctNum = 1;
+                flagCorrectNum = 1;
                 break;}
             else
-                correctNum = 0;
+                flagCorrectNum = 0;
         }
 
-    }while(correctNum == 1);
+    }while(flagCorrectNum == 1);
 
 }
 
@@ -210,33 +217,41 @@ void addTelephoneNum(Contact *contact){
  *  This procedure allows to add a non empty email and checks if there is at least one char before the @,
  *  at least one char after the @ and that the domain ended with .com or .it.
  * @param contact is a pointer to a field of the structure where the string for the email is contained
+ *
+ * I don't know why the procedure doesn't return an error if there is no @. In my mind I'm controlling it, but
+ * at the end it doesn't work.
  */
 void addEmail(Contact *contact){
 
-    char *last3 = NULL, *last4 = NULL, *result = NULL;
-    int sizeEmail = 0, pos = 0, correctEmail = 0, i;
+    char *last3 = NULL, *last4 = NULL, *afterAt = NULL;
+    int sizeEmail = 0, atPos = 0, flagCorrectEmail = 0;
 
     do {
+        // first ask to the user the email
         printf("\nInsert the email in the format example@example.com or .it:");
-
         scanf("%[^\n]s", contact->emailAddress);
         getchar();
-        result = strstr(contact->emailAddress, "@");
-        sizeEmail = strlen(contact->emailAddress);
-        pos = result - contact->emailAddress + 1;
-        last3 = &contact->emailAddress[sizeEmail - 3];
-        last4 = &contact->emailAddress[sizeEmail - 4];
 
-        if(contact->emailAddress[0] != '@' && contact->emailAddress[0] != ' ' && isalnum(contact->emailAddress[pos + 1])
+        afterAt = strstr(contact->emailAddress, "@");      //extract the part of the email from @ on (es @gmail.com)
+        sizeEmail = strlen(contact->emailAddress);         //gives the length of the email
+        atPos = afterAt - contact->emailAddress + 1;       //gives the position of the index associated to the @
+        last3 = &contact->emailAddress[sizeEmail - 3];     //store the last 3 char (es .it)
+        last4 = &contact->emailAddress[sizeEmail - 4];     //store the last 4 char (es .com)
+
+        /* then controls: 1) email can't start with @ or a space; 2) after the @ there will be a alphanumeric char;
+         * 3) email must end with .it or .com
+         * If controls are passed the variable flagCorrectEmail becomes 1 and che cycle ends. Otherwise we have a
+         * warning message and the user has to reinsert the email. */
+        if(contact->emailAddress[0] != '@' && contact->emailAddress[0] != ' ' && isalnum(contact->emailAddress[atPos + 1])
            && ((strcmp(last3, ".it") == 0) || (strcmp(last4, ".com")== 0))){
-            correctEmail=1;}
+            flagCorrectEmail = 1;}
         else{
             printf("\nWarning...");
             printf("\nemail is not valid. Please insert again.\n");
-            correctEmail = 0;
+            flagCorrectEmail = 0;
         }
 
-    }while(correctEmail == 0);
+    }while(flagCorrectEmail == 0);
 
 }
 
@@ -292,23 +307,23 @@ void editContact(Contact *contact){
     switch(choice){
         case 1:
             printf("\nEnter the new name of the contact:");
-            addName(contact);
+            addName(contact);                                           //procedure to enter a new name
             break;
         case 2:
             printf("\nEnter the new surname of the contact:");
-            addSurname(contact);
+            addSurname(contact);                                        //procedure to enter a new surname
             break;
         case 3:
             printf("\nEnter the new mobile number of the contact:");
-            addTelephoneNum(contact);
+            addTelephoneNum(contact);                                   //procedure to enter a new mobile
             break;
         case 4:
             printf("\nEnter the new email");
-            addEmail(contact);
+            addEmail(contact);                                          //procedure to enter a new email
             break;
         case 5:
             printf("\nEnter the new type of the contact");
-            addType(contact);
+            addType(contact);                                           //procedure to assign a new type
             break;
         case 0:
             printf("\nBack to the main menu");
@@ -330,7 +345,7 @@ void editContact(Contact *contact){
  *
  * @param contact
  */
-void deleteContact(Contact * contact){
+/*void deleteContact(Contact * contact){
 
     int contactID, option, type;
 
@@ -379,12 +394,114 @@ void deleteContact(Contact * contact){
 
 }*/
 
-/*8) Aggiungere alle funzionalità del programma la ricerca dei contatti offrendo le seguenti possibilità:
-- ricerca mediante nome (o parte del nome)
-- ricerca mediante cognome (o parte del cognome)
-- ricerca mediante mail (o parte del mail)
-- ricerca mediante numero
-- ricerca mediante categoria
-void searchContact(Contact*){
+/** The goal of this procedure is to search for contacts by letting the user decide how to do it.
+ * Searching options are implemented through a switch case and they are: by name; by surname; by mobile num;
+ * by email and by type.
+ * @param contact is a pointer to the dynamic vector where the contacts are stored.
+ *
+ * I'm aware there are problems and more situations are not taken into account by this procedure (e.g. checks are
+ * done only for the entire string and not also for a portion of it).
+ */
+void searchContact(Contact *contact){
 
-}*/
+    int option, i;
+    TypeOfContact type;
+    char name[STRING_DIM + 1], surname[STRING_DIM + 1], mobile[NUM_DIM + 1], email[STRING_DIM + 1];
+
+    printf("\n");
+    printf("\nSearch contact...");
+    printf("\n1) by name");
+    printf("\n2) by surname");
+    printf("\n3) by mobile number");
+    printf("\n4) by email");
+    printf("\n5) by type of contacts");
+    scanf("%d", &option);
+    getchar();
+
+    switch(option){
+
+        // search by name
+        case 1:
+
+            printf("\nEnter the name you are looking for : ");
+            scanf("%[^\n]s", &name);
+
+            for(i = 0 ; i < currentSize ; ++i){
+
+                if(strcmp(contact[i].name, name) == 0){
+                    printContact(&contact[i]);
+                    }
+                else{
+                    printf("\nNo match found...");}
+            }
+            break;
+
+        // search by surname
+        case 2:
+
+            printf("\nEnter the surname you are looking for : ");
+            scanf("%[^\n]s", &surname);
+
+            for(i = 0 ; i < currentSize ; ++i){
+
+                if(strcmp(contact[i].surname, surname) == 0){
+                    printContact(&contact[i]);
+                    break;}
+                else{
+                    printf("\nNo match found...");}
+            }
+            break;
+
+        // search by mobile
+        case 3:
+
+            printf("\nEnter the mobile number you are looking for : ");
+            scanf("%[^\n]s", &mobile);
+
+            for(i = 0 ; i < currentSize ; ++i){
+
+                if(strcmp(contact[i].telephoneNumber, mobile) == 0){
+                    printContact(&contact[i]);
+                    break;}
+                else{
+                    printf("\nNo match found...");}
+            }
+            break;
+
+        // search by email
+        case 4:
+
+            printf("\nEnter the email you are looking for : ");
+            scanf("%[^\n]s", &email);
+
+            for(i = 0 ; i <= currentSize ; ++i){
+
+                if(strcmp(contact[i].emailAddress, email) == 0){
+                    printContact(&contact[i]);
+                   }
+                else{
+                    printf("\nNo match found...");}
+            }
+            break;
+
+        // search by type
+        case 5:
+
+            printf("\nEnter the type of contact you are looking for : ");
+            scanf("%d", &type);
+
+            for(i = 0; i <= currentSize; ++i){
+                if(type == contact[i].typeOfContact){
+                    printContact(&contact[i]);
+                }
+                else{
+                    printf("\nNo match found...");}
+                }
+            break;
+
+        default:
+            printf("\nInvalid option selected...");
+            break;
+    }
+}
+
