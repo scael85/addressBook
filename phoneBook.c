@@ -295,12 +295,13 @@ void editContact(Contact *contact){
     printf("\n");
 
     int choice;
-    printf("\nWhich field do you want edit? (press 0 to go back)");
-    printf("\n1) name");
-    printf("\n2) surname");
-    printf("\n3) telephone number");
-    printf("\n4) email");
-    printf("\n5) type of the contact");
+    printf("\nWhich field do you want edit? (press 0 to go back)"
+           "\n1) name"
+           "\n2) surname"
+           "\n3) telephone number"
+           "\n4) email"
+           "\n5) type of the contact\n"
+           "\nSelect an option: ");
     scanf("%d", &choice);
     getchar();
 
@@ -345,24 +346,23 @@ void editContact(Contact *contact){
  *
  * @param contact
  */
-/*void deleteContact(Contact * contact){
+void deleteContact(Contact * contact){
 
     int contactID, option, type;
 
-    printf("\n");
-    printf("\nWhat do you want to delete? (press 0 to exit)");
-    printf("\n1) all the phonebook");
-    printf("\n2) a contact with a certain id");
-    printf("\n3) all contacts with a certain name or surname ");
-    printf("\n4) a type of contacts");
-    scanf("%d", &option);
+    printf("\nWhat do you want to delete? (press 0 to exit)"
+           "\n1) all the phonebook"
+           "\n2) a contact with a certain id"
+           "\n3) all contacts with a certain name or surname "
+           "\n4) a type of contacts\n"
+           "\nSelect an option: ");
+            scanf("%d", &option);
 
     switch(option){
         case 1:
             if(contact != NULL)
                 free(contact);
             printf("All phonebook has been deleted.");
-            contact = initializeDynamicVector();
             break;
         case 2:
             printf("\nEnter the ID number of the contact you want to delete: ");
@@ -378,11 +378,11 @@ void editContact(Contact *contact){
             break;
         case 3:
 
-            printf("All contacts named %s have been delated.", .....);
+            //printf("All contacts named %s have been delated.", .....);
             break;
         case 4:
 
-            printf("All contacts of type %d have been delated.", ....);
+            //printf("All contacts of type %d have been delated.", ....);
             break;
         case 0:
             printf("\nBack to the menu");
@@ -392,7 +392,7 @@ void editContact(Contact *contact){
             break;
     }
 
-}*/
+}
 
 /** The goal of this procedure is to search for contacts by letting the user decide how to do it.
  * Searching options are implemented through a switch case and they are: by name; by surname; by mobile num;
@@ -408,13 +408,13 @@ void searchContact(Contact *contact){
     TypeOfContact type;
     char name[STRING_DIM + 1], surname[STRING_DIM + 1], mobile[NUM_DIM + 1], email[STRING_DIM + 1];
 
-    printf("\n");
-    printf("\nSearch contact...");
-    printf("\n1) by name");
-    printf("\n2) by surname");
-    printf("\n3) by mobile number");
-    printf("\n4) by email");
-    printf("\n5) by type of contacts");
+    printf("\nSearch contact..."
+           "\n1) by name"
+           "\n2) by surname"
+           "\n3) by mobile number"
+           "\n4) by email"
+           "\n5) by type of contacts\n"
+           "\nSelect an option: ");
     scanf("%d", &option);
     getchar();
 
